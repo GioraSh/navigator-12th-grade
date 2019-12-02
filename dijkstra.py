@@ -3,6 +3,7 @@ import sqlite3 as lite
 import thread
 import threading
 from random import randint
+from weights import *
 
 def convert_coordinate_to_id(x,y):
     map_db=os.getcwd()+"\map.db"
@@ -21,12 +22,12 @@ def roads_from_node(node):
     map_db=os.getcwd()+"\map.db"
     conn=lite.connect(map_db)
     cursor=conn.cursor()
-    cursor.execute("""SELECT end_node_id,max_speed,distance FROM roads WHERE start_node_id=?""",(node,))
+    cursor.execute("""SELECT end_node_id,max_speed,distance,traffic FROM roads WHERE start_node_id=?""",(node,))
     sql_roads=cursor.fetchall()
     conn.commit()
     roads=[]
     for road in sql_roads:
-        roads.append((road[0],road[2]*0.06/road[1]+0.2))
+        roads.append((road[0],road[2]*0.06/(road[1]*road[3])+0.2))
     return roads
    
 def find_road(user_name,x_start,y_start,x_end,y_end):
