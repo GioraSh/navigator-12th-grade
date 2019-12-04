@@ -95,7 +95,8 @@ def find_road(user_name,x_start,y_start,x_end,y_end):
     print streets
     navigation_cursor.execute("""SELECT time FROM """+str(user_name)+""" WHERE id=?""",(end_node,))
     print navigation_cursor.fetchall()
-    navigation_cursor.execute("""DROP TABLE """+str(user_name))    
+    navigation_cursor.execute("""DROP TABLE """+str(user_name))
+    return (the_way,streets)
 
 
 
