@@ -19,8 +19,11 @@ def guess_traffic(road_id,start_time):
     cursor=conn.cursor()
     cursor.execute("""SELECT distance,max_speed,traffic FROM roads WHERE id=?""",(road_id,))
     road=cursor.fetchall()[0]
+    print "road: "
+    print road
     expected_time=road[0]*3.6/road[1]
     traffic=int((time.time()-start_time)/expected_time)+1
+    print (time.time()-start_time)/expected_time
     cur_traf=road[2]
     if cur_traf>1.0/traffic:
         cursor.execute("""UPDATE roads set traffic=? WHERE id=?""",(1.0/traffic,road_id))

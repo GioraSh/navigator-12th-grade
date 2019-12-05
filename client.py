@@ -1,5 +1,6 @@
 from socket import *
-
+import thread
+import time
 
 def get_departure():
     y_dept=raw_input("enter north/south coordinate of departure: ")
@@ -12,18 +13,30 @@ def get_destination():
     return (x_dest,y_dest)
 
 def ongoing_nav(clientsock):
+    global arrived
+    arrived=False
     way=eval(clientsock.recv(BUFFSIZ))
     print way
+    thread.start_new_thread(arrived_at_node,())
     #clientsock.send(str(get_location()))
     done=False
     while not done:
+        #print arrived
         data=clientsock.recv(BUFFSIZ)
+        #print "hgvjfhgfdhbjkg"
+        print data
         if data=="done":
             done=True
         else:
-            print data
-            data=raw_input("arrived at node: ")
-            clientsock.send(data)
+            #print data
+            if arrived:
+                clientsock.send("yes")
+                arrived=False
+                thread.start_new_thread(arrived_at_node,())
+            else:
+                print "no"
+                clientsock.send("no")
+            #print "sent"
             #clientsock.send(str(get_location()))
     clientsock.close()
 
@@ -35,6 +48,14 @@ def one_time_nav(clientsock):
 
 def get_location():
     pass
+
+def arrived_at_node():
+    global arrived
+    while not arrived:
+        time.sleep(10)
+        data=raw_input("when arrived at node enter something, otherwise push enter: ")
+        if not data=="":
+            arrived=True
 
     
 HOST="localhost"

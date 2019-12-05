@@ -30,16 +30,20 @@ def ongoing_nav(clientsock,info):
     #cur_node=convert_coordinate_to_id(*eval(data))
     start_time=time.time()
     while len(way)>1:
+        print way
         #if cur_node==None:
-        if data=="no":
+        if not data=="yes":
             guess_traffic(roads[0],start_time)
         else:
             way=way[1:]
             streets=streets[1:]
             roads=roads[1:]
             start_time=time.time()
+        print str(streets[0])
         clientsock.send(str(streets[0]))
+        print "jghjhhgjhk"
         data=clientsock.recv(BUFFSIZ)
+        print data
         #cur_node=convert_coordinate_to_id(*eval(data))
     clientsock.send("done")
     clientsock.close()
