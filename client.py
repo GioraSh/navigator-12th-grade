@@ -14,6 +14,15 @@ def get_destination():
 def ongoing_nav(clientsock):
     way=eval(clientsock.recv(BUFFSIZ))
     print way
+    clientsock.send(str(get_location()))
+    done=False
+    while not done:
+        data=clientsock.recv(BUFFSIZ)
+        if data=="done":
+            done=True
+        else:
+            print data
+            clientsock.send(str(get_location()))
     clientsock.close()
 
 
@@ -21,6 +30,9 @@ def one_time_nav(clientsock):
     way=eval(clientsock.recv(BUFFSIZ))
     print way
     clientsock.close()
+
+def get_location():
+    pass
 
     
 HOST="localhost"

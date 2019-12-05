@@ -2,7 +2,7 @@ import sqlite3 as lite
 import os
 import time
 
-def guess_traffic(start_node,end_node,travel_time):
+def guess_traffic_1(start_node,end_node,travel_time):
     map_db=os.getcwd()+"\map.db"
     conn=lite.connect(map_db)
     cursor=conn.cursor()
@@ -13,13 +13,13 @@ def guess_traffic(start_node,end_node,travel_time):
     conn.commit()
 
 
-def guess_traffic_2(road_id,start_time):
+def guess_traffic(road_id,start_time):
     map_db=os.getcwd()+"\map.db"
     conn=lite.connect(map_db)
     cursor=conn.cursor()
     cursor.execute("""SELECT distance,max_speed,traffic FROM roads WHERE id=?""",(road_id,))
     road=cursor.fetchall()[0]
-    expected_time=road[0]*0.06/road[1]
+    expected_time=road[0]*3.6/road[1]
     traffic=int((time.time-start_time)/expected_time)+1
     cur_traf=road[2]
     if cur_traf>1.0/traffic:
