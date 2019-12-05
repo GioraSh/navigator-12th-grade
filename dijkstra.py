@@ -88,15 +88,18 @@ def find_road(user_name,x_start,y_start,x_end,y_end):
         the_way=[(prev_node,node)]+the_way
         node=prev_node
     streets=[]
+    roads_ids=[]
     for road in the_way:
         map_cursor.execute("""SELECT name,direction FROM roads WHERE start_node_id=? AND end_node_id=?""",road)
         streets.append(map_cursor.fetchone())
+        map_cursor.execute("""SELECT id FROM roads WHERE start_node_id=? AND end_node_id=?""",road)
+        roads_ids .append(map_cursor.fetchone()[0])
     print the_way
     print streets
     navigation_cursor.execute("""SELECT time FROM """+str(user_name)+""" WHERE id=?""",(end_node,))
     print navigation_cursor.fetchall()
     navigation_cursor.execute("""DROP TABLE """+str(user_name))
-    return (the_way,streets)
+    return (the_way,streets,roads_id)
 
 
 
