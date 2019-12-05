@@ -14,7 +14,7 @@ def get_destination():
 def ongoing_nav(clientsock):
     way=eval(clientsock.recv(BUFFSIZ))
     print way
-    clientsock.send(str(get_location()))
+    #clientsock.send(str(get_location()))
     done=False
     while not done:
         data=clientsock.recv(BUFFSIZ)
@@ -22,7 +22,9 @@ def ongoing_nav(clientsock):
             done=True
         else:
             print data
-            clientsock.send(str(get_location()))
+            data=raw_input("arrived at node: ")
+            clientsock.send(data)
+            #clientsock.send(str(get_location()))
     clientsock.close()
 
 

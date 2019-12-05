@@ -25,11 +25,13 @@ def handler(clientsock,addr):
 def ongoing_nav(clientsock,info):
     way,streets,roads=find_road(*info)
     clientsock.send(str(streets))
-    data=clientsock.recv(BUFFSIZ)
-    cur_node=convert_coordinate_to_id(*eval(data))
+    data="no"
+    #data=clientsock.recv(BUFFSIZ)
+    #cur_node=convert_coordinate_to_id(*eval(data))
     start_time=time.time()
-    while not cur_node==way[-1]:
-        if cur_node==None:
+    while len(way)>1:
+        #if cur_node==None:
+        if data=="no":
             guess_traffic(roads[0],start_time)
         else:
             way=way[1:]
@@ -38,7 +40,7 @@ def ongoing_nav(clientsock,info):
             start_time=time.time()
         clientsock.send(str(streets[0]))
         data=clientsock.recv(BUFFSIZ)
-        cur_node=convert_coordinate_to_id(*eval(data))
+        #cur_node=convert_coordinate_to_id(*eval(data))
     clientsock.send("done")
     clientsock.close()
 
@@ -47,8 +49,17 @@ def one_time_nav(clientsock,info):
     way=str(find_road(*info)[1])
     clientsock.send(way)
     clientsock.close()
-)
 
+
+
+def traffic_nulifier():
+    while True:
+        nullify_traffic()
+        time.sleep(300)
+
+
+        
+thread.start_new_thread(traffic_nulifier,())
 HOST="localhost"
 PORT=55342
 ADDR=(HOST,PORT)
