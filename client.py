@@ -24,7 +24,7 @@ def ongoing_nav(clientsock):
         #print arrived
         data=clientsock.recv(BUFFSIZ)
         #print "hgvjfhgfdhbjkg"
-        print data
+        #print data
         if data=="done":
             done=True
         else:
@@ -34,7 +34,7 @@ def ongoing_nav(clientsock):
                 arrived=False
                 thread.start_new_thread(arrived_at_node,())
             else:
-                print "no"
+                #print "no"
                 clientsock.send("no")
             #print "sent"
             #clientsock.send(str(get_location()))
