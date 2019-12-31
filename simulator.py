@@ -1,5 +1,6 @@
 import sqlite3 as lite
 import os
+import time
 from random import randint
 
 def start_table():
@@ -45,23 +46,41 @@ def run_round():
     cwd=os.getcwd()
     conn=lite.connect(cwd+r"\simulation.db")
     cursor=conn.cursor()
-    cursor.execute("""CREATE TABLE real_roads(id INTEGER PRIMARY KEY, start_x DECIMAL, start_y DECIMAL, end_x DECIMAL, end_y DECIMAL, max_speed INTEGER, distance DECIMAL, cur_speed INTEGER)""")
-    conn.commit()
+
 
     cursor.execute("""SELECT id,max_speed,cur_speed FROM real_roads""")
     for road in cursor.fetchall():
         change=randint(-1,1)
+        if road[-1]+change==48:
+            print 48
         new_speed=max(min(road[-1]+change,road[1]),1)
         cursor.execute("""UPDATE real_roads set cur_speed=? WHERE id=?""",(new_speed,road[0]))
 
+    cursor.execute("""SELECT cur_speed FROM real_roads""")
+    print cursor.fetchall()
 
     
 def close_simulation():
     cwd=os.getcwd()
     conn=lite.connect(cwd+r"\simulation.db")
     cursor=conn.cursor()
-    cursor.execute("""CREATE TABLE real_roads(id INTEGER PRIMARY KEY, start_x DECIMAL, start_y DECIMAL, end_x DECIMAL, end_y DECIMAL, max_speed INTEGER, distance DECIMAL, cur_speed INTEGER)""")
-    conn.commit()
     cursor.execute("""DROP TABLE real_roads""")
     conn.commit()
 
+
+
+
+
+def main():
+    start_table()
+    stopped=False
+    while not stopped:
+        t=0
+        while t<100:
+            run_round()
+            time.sleep(0.1)
+            t=t+1
+        if raw_input("1 for true: ")=="1":
+            stopped=True
+    close_simulation()
+        
