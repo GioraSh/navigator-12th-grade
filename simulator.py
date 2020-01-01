@@ -2,6 +2,9 @@ import sqlite3 as lite
 import os
 import time
 from random import randint
+import thread
+import threading
+from socket import *
 
 def start_table():
     cwd=os.getcwd()
@@ -38,7 +41,7 @@ def start_table():
         conn.commit()
 
     cursor.execute("""SELECT * FROM real_roads""")
-    print cursor.fetchall()
+    #print cursor.fetchall()
 
 
 
@@ -51,13 +54,11 @@ def run_round():
     cursor.execute("""SELECT id,max_speed,cur_speed FROM real_roads""")
     for road in cursor.fetchall():
         change=randint(-1,1)
-        if road[-1]+change==48:
-            print 48
         new_speed=max(min(road[-1]+change,road[1]),1)
         cursor.execute("""UPDATE real_roads set cur_speed=? WHERE id=?""",(new_speed,road[0]))
-
-    cursor.execute("""SELECT cur_speed FROM real_roads""")
-    print cursor.fetchall()
+    conn.commit()
+    #cursor.execute("""SELECT cur_speed FROM real_roads""")
+    #print cursor.fetchall()
 
     
 def close_simulation():
@@ -76,11 +77,44 @@ def main():
     stopped=False
     while not stopped:
         t=0
-        while t<100:
+        while t<300:
             run_round()
-            time.sleep(0.1)
+            time.sleep(1)
             t=t+1
         if raw_input("1 for true: ")=="1":
             stopped=True
     close_simulation()
+
+try:
+    close_simulation()
+except error:
+    print error
+    pass
+finally:
+    thread.start_new_thread(main,())        
+    HOST="localhost"
+    PORT=53268
+    ADDR=(HOST,PORT)
+    BUFFSIZ=1024
+    
+    serversock=socket(AF_INET,SOCK_STREAM)
+    serversock.bind(ADDR)
+    serversock.listen(1)
+
+
+    cwd=os.getcwd()
+    conn=lite.connect(cwd+r"\simulation.db")
+    cursor=conn.cursor()
+
+
+    clientsock, addr=serversock.accept()
+    print "new connection"
+    data=eval(clientsock.recv(BUFFSIZ))
+    road=data[0]
+    cursor.execute("""SELECT start_x,start_y FROM real_roads WHERE id=?""",(data[0],))
+    loc=tuple(cursor.fetchone())
+    cursor.execute("""SELECT end_x,end_y FROM real_roads WHERE id=?""",(data[-1],))
+    finish=tuple(cursor.fetchone())
+    print data
+    
         
