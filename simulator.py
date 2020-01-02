@@ -6,6 +6,42 @@ import thread
 import threading
 from socket import *
 
+
+class Client(object):
+
+
+    def __init__(self,location,finish,roads_id):
+
+        self.loc=location
+        self.fin=finish
+        self.roads=roads_id
+        self.cur_road=roads_id[0]
+
+    def move(self):
+        cwd=os.getcwd()
+        conn=lite.connect(cwd+r"\simulation.db")
+        cursor=conn.cursor()
+        cursor.execute("""SELECT cur_speed,distance,start_x,start_y,end_x,end_y FROM real_roads WHERE id=?""",(self.cur_road,))
+        speed,dist,st_x,st_y,end_x,end_y=cursor.fetchone()
+        speed=speed/3.6
+        displacement=0.1*speed
+        proportion=displacement/dist
+        x_diff=proportion*(end_x-st_x)
+        y_diff=proportion*(end_y-st_y)
+        cur_x,cur_y=self.loc
+        if max(st_x,end_x)>=cur_x+x_diff>=min(st_x,end_x):
+            cur_x=cur_x+x_diff
+        else:
+            cur_x=end_x
+        if max(st_y,end_y)>=cur_y+y_diff>=min(st_y,end_y):
+            cur_y=cur_y+y_diff
+        else:
+            cur_y=end_y
+        self.loc=(cur_x,cur_y)
+        if self.loc==(end_x,end_y) and not self.loc==self.fin:
+            self.cur_road=self.roads[self.roads.index(self.cur_road)+1]
+
+
 def start_table():
     cwd=os.getcwd()
     conn=lite.connect(cwd+r"\simulation.db")
@@ -85,6 +121,20 @@ def main():
             stopped=True
     close_simulation()
 
+
+
+def handler(client,sock):
+    BUFFSIZ=1024
+
+    
+    moving=True
+    while moving:
+        data=sock.recv(BUFFSIZ)
+        if data=="get loc":
+            sock.send(str(client.loc))
+        if client.loc==client.fin:
+            moving==False
+
 try:
     close_simulation()
 except error:
@@ -117,4 +167,8 @@ finally:
     finish=tuple(cursor.fetchone())
     print data
     
-        
+    cl=Client(loc,finish,data)    
+    thread.start_new_thread(handler,(cl,clientsock))
+    while not cl.loc==cl.fin:
+        cl.move()
+        time.sleep(0.1)

@@ -26,22 +26,31 @@ def ongoing_nav(clientsock,info):
     way,streets,roads=find_road(*info)
     clientsock.send(str(streets))
     clientsock.send(str(roads))
-##    data=clientsock.recv(BUFFSIZ)
-##    cur_node=convert_coordinate_to_id(*eval(data))
-##    start_time=time.time()
-##    while not cur_node==way[-1]:
-##        if cur_node==None:
-##            guess_traffic(roads[0],start_time)
-##        else:
-##            way=way[1:]
-##            streets=streets[1:]
-##            roads=roads[1:]
-##            start_time=time.time()
-##        clientsock.send(str(streets[0]))
-##        data=clientsock.recv(BUFFSIZ)
-##        cur_node=convert_coordinate_to_id(*eval(data))
-##    clientsock.send("done")
-##    clientsock.close()
+    data=clientsock.recv(BUFFSIZ)
+    cur_node=convert_coordinate_to_id(*eval(data))
+    last_node=cur_node
+    change_last=False
+    start_time=time.time()
+    while not cur_node==way[-1]:
+        if cur_node==None or cur_node==last_node:
+            guess_traffic(roads[0],start_time)
+            change_last=False
+        else:
+            way=way[1:]
+            streets=streets[1:]
+            roads=roads[1:]
+            start_time=time.time()
+            change_last=True
+        try:
+            clientsock.send(str(streets[0]))
+        except IndexError:
+            clientsock.send("done")
+        data=clientsock.recv(BUFFSIZ)
+        cur_node=convert_coordinate_to_id(*eval(data))
+        if change_last:
+            last_node=cur_node
+    #clientsock.send("done")
+    clientsock.close()
 
 
 

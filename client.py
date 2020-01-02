@@ -29,16 +29,17 @@ def ongoing_nav(clientsock):
     roads=eval(clientsock.recv(BUFFSIZ))
     print way
     sim_socket.send(str(roads))
+    time.sleep(1)
     #thread.start_new_thread(arrived_at_node,())
-##    clientsock.send(str(get_location()))
-##    done=False
-##    while not done:
-##        data=clientsock.recv(BUFFSIZ)
-##        if data=="done":
-##            done=True
-##        else:
-##            print data
-##            clientsock.send(str(get_location())
+    clientsock.send(str(get_location(sim_socket)))
+    done=False
+    while not done:
+        data=clientsock.recv(BUFFSIZ)
+        if data=="done":
+            done=True
+        else:
+            print data
+            clientsock.send(str(get_location(sim_socket)))
     clientsock.close()
 
 
@@ -79,7 +80,7 @@ except error:
         raise error
 else:
     data=raw_input("enter username: ")
-    clientsock.send(data)
+    clientsock.send("giora")
     data=str(get_departure())
     print data
     clientsock.send(data)
