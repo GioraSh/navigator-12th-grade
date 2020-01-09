@@ -24,6 +24,7 @@ def handler(clientsock,addr):
 
 def ongoing_nav(clientsock,info):
     way,streets,roads=find_road(*info)
+    print roads
     clientsock.send(str(streets))
     clientsock.send(str(roads))
     data=clientsock.recv(BUFFSIZ)
@@ -66,8 +67,7 @@ def traffic_nulifier():
         nullify_traffic()
         time.sleep(300)
 
-
-        
+       
 thread.start_new_thread(traffic_nulifier,())
 HOST="localhost"
 PORT=55342

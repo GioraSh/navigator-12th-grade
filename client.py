@@ -42,7 +42,6 @@ def ongoing_nav(clientsock):
             clientsock.send(str(get_location(sim_socket)))
     clientsock.close()
 
-
 def one_time_nav(clientsock):
     way=eval(clientsock.recv(BUFFSIZ))
     print way
@@ -80,7 +79,7 @@ except error:
         raise error
 else:
     data=raw_input("enter username: ")
-    clientsock.send("giora")
+    clientsock.send("data")
     data=str(get_departure())
     print data
     clientsock.send(data)
