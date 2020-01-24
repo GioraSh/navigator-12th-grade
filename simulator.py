@@ -144,7 +144,7 @@ except error:
     pass
 finally:
     thread.start_new_thread(main,())        
-    HOST="localhost"
+    HOST="127.0.0.1"
     PORT=53268
     ADDR=(HOST,PORT)
     BUFFSIZ=1024
@@ -162,6 +162,8 @@ finally:
     clientsock, addr=serversock.accept()
     print "new connection"
     data=eval(clientsock.recv(BUFFSIZ))
+    print data
+    print type(data)
     road=data[0]
     cursor.execute("""SELECT start_x,start_y FROM real_roads WHERE id=?""",(data[0],))
     loc=tuple(cursor.fetchone())

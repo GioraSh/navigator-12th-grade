@@ -25,10 +25,11 @@ def handler(clientsock,addr):
 def ongoing_nav(clientsock,info):
     way,streets,roads=find_road(*info)
     print roads
-    clientsock.send(str(streets))
+    #clientsock.send(str(streets))
     clientsock.send(str(roads))
     data=clientsock.recv(BUFFSIZ)
     cur_node=convert_coordinate_to_id(*eval(data))
+    time.sleep(1)
     last_node=cur_node
     change_last=False
     start_time=time.time()
@@ -69,7 +70,7 @@ def traffic_nulifier():
 
        
 thread.start_new_thread(traffic_nulifier,())
-HOST="localhost"
+HOST="127.0.0.1"
 PORT=55342
 ADDR=(HOST,PORT)
 BUFFSIZ=1024
