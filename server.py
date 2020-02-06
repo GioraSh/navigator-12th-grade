@@ -33,7 +33,7 @@ def ongoing_nav(clientsock,info):
     last_node=cur_node
     change_last=False
     start_time=time.time()
-    while not cur_node==way[-1]:
+    while not way==[]:
         if cur_node==None or cur_node==last_node:
             guess_traffic(roads[0],start_time)
             change_last=False
@@ -47,17 +47,19 @@ def ongoing_nav(clientsock,info):
             clientsock.send(str(streets[0]))
         except IndexError:
             clientsock.send("done")
-        data=clientsock.recv(BUFFSIZ)
-        cur_node=convert_coordinate_to_id(*eval(data))
-        if change_last:
-            last_node=cur_node
+        else:
+            print way
+            data=clientsock.recv(BUFFSIZ)
+            cur_node=convert_coordinate_to_id(*eval(data))
+            if change_last:
+                last_node=cur_node
     #clientsock.send("done")
     clientsock.close()
 
 
 
 def one_time_nav(clientsock,info):
-    way=str(find_road(*info)[1])
+    way=str(find_road(*info)[0])
     clientsock.send(way)
     clientsock.close()
 

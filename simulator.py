@@ -73,10 +73,7 @@ def start_table():
     map_conn.commit()
 
     for road in needed_roads:
-        if road[0]==25:
-            cursor.execute("""INSERT INTO real_roads(id,start_x,start_y,end_x,end_y,max_speed,distance,cur_speed) VALUES(?,?,?,?,?,?,?,?)""",tuple(road)+(1,))
-        else:
-            cursor.execute("""INSERT INTO real_roads(id,start_x,start_y,end_x,end_y,max_speed,distance,cur_speed) VALUES(?,?,?,?,?,?,?,?)""",tuple(road)+(road[-2],))
+        cursor.execute("""INSERT INTO real_roads(id,start_x,start_y,end_x,end_y,max_speed,distance,cur_speed) VALUES(?,?,?,?,?,?,?,?)""",tuple(road)+(road[-2],))
         conn.commit()
 
     cursor.execute("""SELECT * FROM real_roads""")
@@ -91,10 +88,9 @@ def run_round():
 
     cursor.execute("""SELECT id,max_speed,cur_speed FROM real_roads""")
     for road in cursor.fetchall():
-        if not road[0]==25:
-            change=randint(-1,1)
-            new_speed=max(min(road[-1]+change,road[1]),1)
-            cursor.execute("""UPDATE real_roads set cur_speed=? WHERE id=?""",(new_speed,road[0]))
+        change=randint(-1,1)
+        new_speed=max(min(road[-1]+change,road[1]),1)
+        cursor.execute("""UPDATE real_roads set cur_speed=? WHERE id=?""",(new_speed,road[0]))
     conn.commit()
 
 
@@ -123,19 +119,37 @@ def main():
             stopped=True
     close_simulation()
 
+def clienthandler(clientsock,addr):
+    print "new connection"
+    data=eval(clientsock.recv(BUFFSIZ))
+    print data
+    print type(data)
+    road=data[0]
+    cursor.execute("""SELECT start_x,start_y FROM real_roads WHERE id=?""",(data[0],))
+    loc=tuple(cursor.fetchone())
+    cursor.execute("""SELECT end_x,end_y FROM real_roads WHERE id=?""",(data[-1],))
+    finish=tuple(cursor.fetchone())
+    print data
+    
+    cl=Client(loc,finish,data)    
+    thread.start_new_thread(move_handler,(cl,))
 
-
-def handler(client,sock):
-    BUFFSIZ=1024
 
     
     moving=True
     while moving:
         data=sock.recv(BUFFSIZ)
         if data=="get loc":
-            sock.send(str(client.loc))
-        if client.loc==client.fin:
+            sock.send(str(cl.loc))
+        if cl.loc==cl.fin:
             moving==False
+    
+
+            
+def move_handler(client):
+    while not client.loc==client.fin:
+        client.move()
+        time.sleep(0.1)
 
 try:
     close_simulation()
@@ -158,21 +172,17 @@ finally:
     conn=lite.connect(cwd+r"\simulation.db")
     cursor=conn.cursor()
 
+    has_new=True
+    runs=100
+    #recieves connections
+    while runs>0:
+        runs=runs-1
+        if has_new:
+            has_new=False
+            clientsock, addr=serversock.accept()
+            print "\n\n\n"+"new connection"+"\n\n\n"
+            thread.start_new_thread(clienthandler,(clientsock, addr))
+            has_new=True
+    serversock.close()
 
-    clientsock, addr=serversock.accept()
-    print "new connection"
-    data=eval(clientsock.recv(BUFFSIZ))
-    print data
-    print type(data)
-    road=data[0]
-    cursor.execute("""SELECT start_x,start_y FROM real_roads WHERE id=?""",(data[0],))
-    loc=tuple(cursor.fetchone())
-    cursor.execute("""SELECT end_x,end_y FROM real_roads WHERE id=?""",(data[-1],))
-    finish=tuple(cursor.fetchone())
-    print data
     
-    cl=Client(loc,finish,data)    
-    thread.start_new_thread(handler,(cl,clientsock))
-    while not cl.loc==cl.fin:
-        cl.move()
-        time.sleep(0.1)
