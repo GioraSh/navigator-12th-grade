@@ -120,6 +120,10 @@ def main():
     close_simulation()
 
 def clienthandler(clientsock,addr):
+    cwd=os.getcwd()
+    conn=lite.connect(cwd+r"\simulation.db")
+    cursor=conn.cursor()
+    
     print "new connection"
     data=eval(clientsock.recv(BUFFSIZ))
     print data
@@ -138,9 +142,9 @@ def clienthandler(clientsock,addr):
     
     moving=True
     while moving:
-        data=sock.recv(BUFFSIZ)
+        data=clientsock.recv(BUFFSIZ)
         if data=="get loc":
-            sock.send(str(cl.loc))
+            clientsock.send(str(cl.loc))
         if cl.loc==cl.fin:
             moving==False
     
