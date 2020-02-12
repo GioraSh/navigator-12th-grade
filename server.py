@@ -24,7 +24,10 @@ def handler(clientsock,addr):
 
 def ongoing_nav(clientsock,info):
     way,streets,roads=find_road(*info)
+    print way
+    print streets
     print roads
+    clientsock.send(str(way))
     #clientsock.send(str(streets))
     clientsock.send(str(roads))
     data=clientsock.recv(BUFFSIZ)
@@ -48,7 +51,6 @@ def ongoing_nav(clientsock,info):
         except IndexError:
             clientsock.send("done")
         else:
-            print way
             data=clientsock.recv(BUFFSIZ)
             cur_node=convert_coordinate_to_id(*eval(data))
             if change_last:
