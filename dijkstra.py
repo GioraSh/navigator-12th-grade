@@ -18,6 +18,14 @@ def convert_coordinate_to_id(x,y):
 ##    n=randint(0,17)
     return n
 
+def convert_streets_to_coordinates(street1, street2):
+    map_db=os.getcwd()+"\map.db"
+    conn=lite.connect(map_db)
+    cursor=conn.cursor()
+    cursor.execute("""SELECT min_x,max_x,min_y,max_y FROM nodes WHERE ? in (north,east,south,west) and ? in (north,east,south,west)""",(street1,street2))
+    a=cursor.fetchone()
+    return ((a[0]+a[1])/2,(a[2]+a[3])/2)
+
 def roads_from_node(node):
     map_db=os.getcwd()+"\map.db"
     conn=lite.connect(map_db)

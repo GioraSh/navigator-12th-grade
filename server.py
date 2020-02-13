@@ -8,9 +8,11 @@ def handler(clientsock,addr):
     sock_open=True
     while sock_open:
         user_name=(clientsock.recv(BUFFSIZ),)
-        dept=eval(clientsock.recv(BUFFSIZ))
+        #dept=eval(clientsock.recv(BUFFSIZ))
+        dept=convert_streets_to_coordinates(*eval(clientsock.recv(BUFFSIZ)))
         print dept
-        dest=eval(clientsock.recv(BUFFSIZ))
+        #dest=eval(clientsock.recv(BUFFSIZ))
+        dest=convert_streets_to_coordinates(*eval(clientsock.recv(BUFFSIZ)))
         print dest
         info=user_name+dept+dest
         print info
@@ -72,7 +74,8 @@ def traffic_nulifier():
         nullify_traffic()
         time.sleep(300)
 
-       
+
+print lite.threadsafety       
 thread.start_new_thread(traffic_nulifier,())
 HOST="127.0.0.1"
 PORT=55342
