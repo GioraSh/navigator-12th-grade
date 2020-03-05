@@ -75,5 +75,5 @@ def print_streets(file_name):
     conn=lite.connect(file_name)
     conn.commit()
     cursor=conn.cursor()
-    cursor.execute("""SELECT name FROM roads""")
+    cursor.execute("""SELECT id,name,direction FROM roads""")
     print cursor.fetchall()

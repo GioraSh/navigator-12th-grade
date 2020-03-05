@@ -160,8 +160,10 @@ def adminhandler(clientsock,addr):
     cursor=conn.cursor()
 
     data=clientsock.recv(BUFFSIZ)
+    print data
     id_speed=data.split(",")
     cursor.execute("""UPDATE real_roads set cur_speed=? WHERE id=?""",(id_speed[1],id_speed[0]))
+    conn.commit()
             
 def move_handler(client):
     while not client.loc==client.fin:
