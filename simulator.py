@@ -73,7 +73,7 @@ def start_table():
     map_conn.commit()
 
     for road in needed_roads:
-        if road[0]!=14:
+        if road[0]!=-1:
             cursor.execute("""INSERT INTO real_roads(id,start_x,start_y,end_x,end_y,max_speed,distance,cur_speed) VALUES(?,?,?,?,?,?,?,?)""",tuple(road)+(road[-2],))
             conn.commit()
         else:
@@ -92,7 +92,7 @@ def run_round():
 
     cursor.execute("""SELECT id,max_speed,cur_speed FROM real_roads""")
     for road in cursor.fetchall():
-        if road[0]!=14:
+        if road[0]!=-1:
             change=randint(-1,1)
             new_speed=max(min(road[-1]+change,road[1]),1)
             cursor.execute("""UPDATE real_roads set cur_speed=? WHERE id=?""",(new_speed,road[0]))

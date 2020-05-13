@@ -40,9 +40,7 @@ def roads_from_node(node):
    
 def find_road(user_name,x_start,y_start,x_end,y_end):
     start_node=(convert_coordinate_to_id(x_start,y_start))
-    print start_node
     end_node=(convert_coordinate_to_id(x_end,y_end))
-    print end_node
     navigator_db=os.getcwd()+r"\navigator.db"
     navigation_conn=lite.connect(navigator_db)
     navigation_cursor=navigation_conn.cursor()
@@ -60,7 +58,6 @@ def find_road(user_name,x_start,y_start,x_end,y_end):
     navigation_conn.commit()
 
     navigation_cursor.execute("""SELECT * FROM """+user_name)
-    print navigation_cursor.fetchall()
     
     node=start_node
     while not node==end_node:
@@ -88,7 +85,6 @@ def find_road(user_name,x_start,y_start,x_end,y_end):
         
 
     navigation_cursor.execute("""SELECT * FROM """+str(user_name))
-    print navigation_cursor.fetchall()
     the_way=[]
     while not node==start_node:
         navigation_cursor.execute("""SELECT previous_node FROM """+str(user_name)+""" WHERE id=?""",(node,))
@@ -102,10 +98,7 @@ def find_road(user_name,x_start,y_start,x_end,y_end):
         streets.append(map_cursor.fetchone())
         map_cursor.execute("""SELECT id FROM roads WHERE start_node_id=? AND end_node_id=?""",road)
         roads_ids.append(map_cursor.fetchone()[0])
-    print the_way
-    print streets
     navigation_cursor.execute("""SELECT time FROM """+str(user_name)+""" WHERE id=?""",(end_node,))
-    print navigation_cursor.fetchall()
     navigation_cursor.execute("""DROP TABLE """+str(user_name))
     return (the_way,streets,roads_ids)
 
