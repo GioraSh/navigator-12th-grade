@@ -87,8 +87,18 @@ def get_history():
 
     cursor.execute("""SELECT * FROM history""")
     requests=cursor.fetchall()
-    print requests
     hist=[]
     for req in requests:
         hist.append([req[0],req[1]]+[float(x.strip("()")) for x in req[2].strip("[]").split(", ")]+[req[3]])
     return hist
+
+
+def get_road_id(node_id_1,node_id_2):
+    map_db=os.getcwd()+r"\map.db"
+    conn=lite.connect(map_db)
+    cursor=conn.cursor()
+
+    print node_id_1
+    print node_id_2
+    cursor.execute("""SELECT id FROM roads WHERE start_node_id==? AND end_node_id==?""",(node_id_1,node_id_2))
+    return cursor.fetchone()

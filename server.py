@@ -18,8 +18,18 @@ def admin_handler(clientsock,addr):
         if data=="history":
             for request in get_history():
                 clientsock.send(str(request))
+                print request
+                clientsock.recv(BUFFSIZ)
             clientsock.send("sent history")
-            clientsock.recv(BUFFSIZ)
+        elif data=="roadID":
+            data=clientsock.recv(BUFFSIZ)
+            data=data.split("; ")
+            print data
+            print eval(data[0])
+            data=get_road_id(convert_streets_to_coordinates(*eval(data[0])),convert_streets_to_coordinates(*eval(data[1])))
+            print data
+            clientsock.send(data)
+        data=clientsock.recv(BUFFSIZ)
     clientsock.close()
 
     
@@ -87,7 +97,7 @@ def ongoing_nav(clientsock,infos,points_ammount):
                 cur_node=convert_coordinate_to_id(*eval(data))
                 if change_last:
                     last_node=cur_node
-    clientsock.send("done")
+    clientsock.send("arrived at destination")
     clientsock.close()
 
 
@@ -114,7 +124,7 @@ def traffic_nulifier():
 print lite.threadsafety
 start_history()
 thread.start_new_thread(traffic_nulifier,())
-HOST="127.0.0.1"
+HOST="192.168.0.101"
 PORT=55342
 ADDR=(HOST,PORT)
 BUFFSIZ=1024

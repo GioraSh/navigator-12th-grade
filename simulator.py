@@ -116,7 +116,7 @@ def main():
     stopped=False
     while not stopped:
         t=0
-        while t<300:
+        while True:
             run_round()
             time.sleep(1)
             t=t+1
@@ -161,14 +161,19 @@ def adminhandler(clientsock,addr):
 
     data=clientsock.recv(BUFFSIZ)
     print data
-    id_speed=data.split(",")
-    cursor.execute("""UPDATE real_roads set cur_speed=? WHERE id=?""",(id_speed[1],id_speed[0]))
-    conn.commit()
-            
+    while data!="close":
+        id_speed=data.split(",")
+        cursor.execute("""UPDATE real_roads set cur_speed=? WHERE id=?""",(id_speed[1],id_speed[0]))
+        conn.commit()
+        data=clientsock.recv(BUFFSIZ)
+        print data
+    clientsock.close()
+    
 def move_handler(client):
     while not client.loc==client.fin:
         client.move()
         time.sleep(0.1)
+
 
 try:
     close_simulation()
@@ -177,7 +182,7 @@ except error:
     pass
 finally:
     thread.start_new_thread(main,())        
-    HOST="127.0.0.1"
+    HOST="192.168.0.101"
     PORT=53268
     ADDR=(HOST,PORT)
     BUFFSIZ=1024
