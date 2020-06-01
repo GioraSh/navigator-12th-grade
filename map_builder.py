@@ -70,3 +70,10 @@ def enter_road(file_name):
             identity=identity+1
         else:
             done=True
+
+def print_streets(file_name):
+    conn=lite.connect(file_name)
+    conn.commit()
+    cursor=conn.cursor()
+    cursor.execute("""SELECT id,name,direction FROM roads""")
+    print cursor.fetchall()
